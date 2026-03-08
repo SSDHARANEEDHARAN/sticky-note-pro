@@ -1,16 +1,24 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, StickyNote as StickyNoteIcon, Loader2 } from "lucide-react";
+import { Plus, StickyNote as StickyNoteIcon, Loader2, LogOut } from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
 import StickyNote from "@/components/StickyNote";
 import ColorPicker from "@/components/ColorPicker";
 import BackgroundPicker, { type BgStyle } from "@/components/BackgroundPicker";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import ShareBoard from "@/components/ShareBoard";
 import { fetchNotes, createNote, updateNote, deleteNote, type NoteColor } from "@/lib/notes-api";
+import { supabase } from "@/integrations/supabase/client";
 
 const randomRotation = () => (Math.random() - 0.5) * 8;
 
-const Index = () => {
+interface IndexProps {
+  session: Session;
+}
+
+const Index = ({ session }: IndexProps) => {
   const queryClient = useQueryClient();
+  const userId = session.user.id;
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
   const [bgStyle, setBgStyle] = useState<BgStyle>(() => {
     const saved = localStorage.getItem("stickynotes-bg") as BgStyle | null;
@@ -27,6 +35,17 @@ const Index = () => {
     queryKey: ["sticky_notes"],
     queryFn: fetchNotes,
   });
+
+  // Realtime subscription for live sync
+  useEffect(() => {
+    const channel = supabase
+      .channel("sticky_notes_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "sticky_notes" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["sticky_notes"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const addMutation = useMutation({
     mutationFn: createNote,
@@ -53,6 +72,7 @@ const Index = () => {
       width: 224,
       height: 180,
       reminder_at: null,
+      user_id: userId,
     });
   };
 
@@ -89,6 +109,10 @@ const Index = () => {
 
   const handleDelete = (id: string) => deleteMutation.mutate(id);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <div className="min-h-screen relative bg-background overflow-hidden">
       <AnimatedBackground style={bgStyle} />
@@ -103,10 +127,11 @@ const Index = () => {
           <h1 className="text-2xl font-handwriting font-bold text-card-foreground">My Sticky Notes</h1>
         </div>
 
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm px-3 py-2 rounded-lg shadow-note">
             <BackgroundPicker selected={bgStyle} onSelect={handleBgChange} />
           </div>
+          <ShareBoard userId={userId} />
           <div className="flex items-center gap-4 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
             <ColorPicker selected={selectedColor} onSelect={setSelectedColor} />
             <button
@@ -118,6 +143,13 @@ const Index = () => {
               Add Note
             </button>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 bg-card/80 backdrop-blur-sm text-card-foreground rounded-lg hover:opacity-90 transition-opacity shadow-note"
+            title="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
