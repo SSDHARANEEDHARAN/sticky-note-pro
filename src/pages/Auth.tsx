@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { StickyNote as StickyNoteIcon, Loader2, ArrowLeft, Mail, Phone, Chrome } from "lucide-react";
 import { toast } from "sonner";
 
-type View = "login" | "signup" | "forgot" | "magic" | "phone" | "otp-verify";
+type View = "login" | "signup" | "forgot" | "magic";
 
 export default function Auth() {
   const [view, setView] = useState<View>("login");
