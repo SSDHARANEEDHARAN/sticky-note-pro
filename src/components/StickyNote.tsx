@@ -104,6 +104,8 @@ export default function StickyNote({
     if (diff <= 0) return null;
     const mins = Math.floor(diff / 60000);
     const hrs = Math.floor(mins / 60);
+    const days = Math.floor(hrs / 24);
+    if (days > 0) return `${days}d ${hrs % 24}h`;
     if (hrs > 0) return `${hrs}h ${mins % 60}m`;
     return `${mins}m`;
   };
