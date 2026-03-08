@@ -40,14 +40,6 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) toast.error(error.message);
       else toast.success("Check your email for a magic link!");
-    } else if (view === "phone") {
-      const { error } = await supabase.auth.signInWithOtp({ phone });
-      if (error) toast.error(error.message);
-      else { toast.success("OTP sent to your phone!"); setView("otp-verify"); }
-    } else if (view === "otp-verify") {
-      const { error } = await supabase.auth.verifyOtp({ phone, token: otpCode, type: "sms" });
-      if (error) toast.error(error.message);
-      else navigate("/");
     }
     setLoading(false);
   };
