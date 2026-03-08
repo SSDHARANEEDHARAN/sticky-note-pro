@@ -42,7 +42,7 @@ const pinColors: Record<NoteColor, string> = {
 };
 
 export default function StickyNote({
-  id, text, color, rotation, positionX, positionY, width, height, reminderAt,
+  id, text, color, rotation, positionX, positionY, width, height, reminderAt, authorName, isOwnNote,
   onDelete, onUpdate, onDragEnd, onResizeEnd, onSetReminder,
 }: StickyNoteProps) {
   const [isHovered, setIsHovered] = useState(false);
