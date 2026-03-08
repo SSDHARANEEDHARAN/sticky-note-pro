@@ -47,6 +47,11 @@ export default function StickyNote({
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [showTimerPicker, setShowTimerPicker] = useState(false);
+  const [pickerTab, setPickerTab] = useState<"quick" | "custom">("quick");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedHour, setSelectedHour] = useState("12");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+  const [selectedAmPm, setSelectedAmPm] = useState<"AM" | "PM">("AM");
   const [isAlerting, setIsAlerting] = useState(false);
   const [pos, setPos] = useState({ x: positionX, y: positionY });
   const [size, setSize] = useState({ w: width, h: height });
