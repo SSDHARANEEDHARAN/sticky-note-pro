@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, StickyNote as StickyNoteIcon, Loader2, LogOut } from "lucide-react";
+import { Plus, StickyNote as StickyNoteIcon, Loader2, LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import StickyNote from "@/components/StickyNote";
 import ColorPicker from "@/components/ColorPicker";
@@ -18,6 +19,7 @@ interface IndexProps {
 
 const Index = ({ session }: IndexProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const userId = session.user.id;
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
   const [bgStyle, setBgStyle] = useState<BgStyle>(() => {
@@ -143,6 +145,13 @@ const Index = ({ session }: IndexProps) => {
               Add Note
             </button>
           </div>
+          <button
+            onClick={() => navigate("/profile")}
+            className="flex items-center gap-2 px-3 py-2 bg-card/80 backdrop-blur-sm text-card-foreground rounded-lg hover:opacity-90 transition-opacity shadow-note"
+            title="Profile"
+          >
+            <User className="w-4 h-4" />
+          </button>
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 bg-card/80 backdrop-blur-sm text-card-foreground rounded-lg hover:opacity-90 transition-opacity shadow-note"
