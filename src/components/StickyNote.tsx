@@ -188,6 +188,19 @@ export default function StickyNote({
     setShowTimerPicker(false);
   };
 
+  const handleSetCustomReminder = () => {
+    if (!selectedDate) return;
+    let hour = parseInt(selectedHour);
+    const minute = parseInt(selectedMinute);
+    if (selectedAmPm === "PM" && hour !== 12) hour += 12;
+    if (selectedAmPm === "AM" && hour === 12) hour = 0;
+    const target = new Date(selectedDate);
+    target.setHours(hour, minute, 0, 0);
+    if (target.getTime() <= Date.now()) return; // don't set past reminders
+    onSetReminder(id, target.toISOString());
+    setShowTimerPicker(false);
+  };
+
   const timeRemaining = getTimeRemaining();
 
   return (
