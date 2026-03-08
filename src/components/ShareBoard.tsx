@@ -84,6 +84,15 @@ export default function ShareBoard({ userId }: ShareBoardProps) {
       toast.success("Connected! You can now see their notes.");
       setJoinCode("");
       setShowPanel(false);
+      // Notify board owner via email
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", userId)
+        .maybeSingle();
+      supabase.functions.invoke("board-share-email", {
+        body: { owner_id: share.owner_id, guest_name: profile?.display_name || "Someone" },
+      }).catch(() => {}); // fire-and-forget
     }
     setLoading(false);
   };
