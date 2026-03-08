@@ -2,18 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import { StickyNote as StickyNoteIcon, Loader2, ArrowLeft, Mail, Phone, Chrome } from "lucide-react";
+import { StickyNote as StickyNoteIcon, Loader2, ArrowLeft, Mail, Chrome } from "lucide-react";
 import { toast } from "sonner";
 
-type View = "login" | "signup" | "forgot" | "magic" | "phone" | "otp-verify";
+type View = "login" | "signup" | "forgot" | "magic";
 
 export default function Auth() {
   const [view, setView] = useState<View>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -42,14 +40,6 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) toast.error(error.message);
       else toast.success("Check your email for a magic link!");
-    } else if (view === "phone") {
-      const { error } = await supabase.auth.signInWithOtp({ phone });
-      if (error) toast.error(error.message);
-      else { toast.success("OTP sent to your phone!"); setView("otp-verify"); }
-    } else if (view === "otp-verify") {
-      const { error } = await supabase.auth.verifyOtp({ phone, token: otpCode, type: "sms" });
-      if (error) toast.error(error.message);
-      else navigate("/");
     }
     setLoading(false);
   };
@@ -70,11 +60,11 @@ export default function Auth() {
 
   const titles: Record<View, string> = {
     login: "Welcome Back!", signup: "Join Sticky Notes", forgot: "Reset Password",
-    magic: "Magic Link", phone: "Phone Login", "otp-verify": "Enter OTP",
+    magic: "Magic Link",
   };
   const buttons: Record<View, string> = {
     login: "Sign In", signup: "Sign Up", forgot: "Send Reset Link",
-    magic: "Send Magic Link", phone: "Send OTP", "otp-verify": "Verify",
+    magic: "Send Magic Link",
   };
 
   const isMainView = view === "login" || view === "signup";
@@ -119,21 +109,6 @@ export default function Auth() {
               </div>
             )}
 
-            {view === "phone" && (
-              <div>
-                <label className="block text-sm font-medium text-card-foreground/70 mb-1">Phone Number</label>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background/50 text-foreground outline-none focus:ring-2 focus:ring-ring" placeholder="+1234567890" />
-              </div>
-            )}
-
-            {view === "otp-verify" && (
-              <div>
-                <label className="block text-sm font-medium text-card-foreground/70 mb-1">OTP Code</label>
-                <input type="text" value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required maxLength={6}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background/50 text-foreground outline-none focus:ring-2 focus:ring-ring font-mono text-center tracking-[0.5em] text-xl" placeholder="000000" />
-              </div>
-            )}
 
             <button type="submit" disabled={loading}
               className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
@@ -161,16 +136,10 @@ export default function Auth() {
                   Apple
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setView("magic")}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm">
-                  <Mail className="w-4 h-4" /> Magic Link
-                </button>
-                <button onClick={() => setView("phone")}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm">
-                  <Phone className="w-4 h-4" /> Phone
-                </button>
-              </div>
+              <button onClick={() => setView("magic")}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm w-full">
+                <Mail className="w-4 h-4" /> Magic Link
+              </button>
             </div>
           )}
 
