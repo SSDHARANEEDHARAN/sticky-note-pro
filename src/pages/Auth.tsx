@@ -136,16 +136,10 @@ export default function Auth() {
                   Apple
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setView("magic")}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm">
-                  <Mail className="w-4 h-4" /> Magic Link
-                </button>
-                <button onClick={() => setView("phone")}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm">
-                  <Phone className="w-4 h-4" /> Phone
-                </button>
-              </div>
+              <button onClick={() => setView("magic")}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border bg-background/50 text-foreground hover:bg-background/80 transition-colors font-medium text-sm w-full">
+                <Mail className="w-4 h-4" /> Magic Link
+              </button>
             </div>
           )}
 
