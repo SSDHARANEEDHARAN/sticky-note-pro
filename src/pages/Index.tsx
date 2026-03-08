@@ -1,81 +1,133 @@
-import { useState } from "react";
-import { Plus, StickyNote as StickyNoteIcon } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, StickyNote as StickyNoteIcon, Loader2 } from "lucide-react";
 import StickyNote from "@/components/StickyNote";
 import ColorPicker from "@/components/ColorPicker";
-
-type NoteColor = "yellow" | "pink" | "blue" | "green" | "orange";
-
-interface Note {
-  id: string;
-  text: string;
-  color: NoteColor;
-  rotation: number;
-}
+import { fetchNotes, createNote, updateNote, deleteNote, type NoteColor } from "@/lib/notes-api";
 
 const randomRotation = () => (Math.random() - 0.5) * 8;
 
 const Index = () => {
-  const [notes, setNotes] = useState<Note[]>([
-    { id: "1", text: "Welcome to Sticky Notes! ✨", color: "yellow", rotation: randomRotation() },
-    { id: "2", text: "Click + to add a new note", color: "pink", rotation: randomRotation() },
-    { id: "3", text: "Pick a color before adding", color: "blue", rotation: randomRotation() },
-  ]);
+  const queryClient = useQueryClient();
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
+  const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  const addNote = () => {
-    setNotes((prev) => [
-      ...prev,
-      { id: Date.now().toString(), text: "", color: selectedColor, rotation: randomRotation() },
-    ]);
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ["sticky_notes"],
+    queryFn: fetchNotes,
+  });
+
+  const addMutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sticky_notes"] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, ...updates }: { id: string } & Partial<{ text: string; position_x: number; position_y: number }>) =>
+      updateNote(id, updates),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sticky_notes"] }),
+  });
+
+  const handleAdd = () => {
+    addMutation.mutate({
+      text: "",
+      color: selectedColor,
+      rotation: randomRotation(),
+      position_x: 80 + Math.random() * 400,
+      position_y: 120 + Math.random() * 300,
+    });
   };
 
-  const deleteNote = (id: string) => setNotes((prev) => prev.filter((n) => n.id !== id));
+  const handleUpdateText = useCallback((id: string, text: string) => {
+    // Optimistic local update
+    queryClient.setQueryData(["sticky_notes"], (old: any) =>
+      old?.map((n: any) => (n.id === id ? { ...n, text } : n))
+    );
+    // Debounced save
+    if (debounceTimers.current[id]) clearTimeout(debounceTimers.current[id]);
+    debounceTimers.current[id] = setTimeout(() => {
+      updateMutation.mutate({ id, text });
+    }, 500);
+  }, [queryClient, updateMutation]);
 
-  const updateNote = (id: string, text: string) =>
-    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, text } : n)));
+  const handleDragEnd = useCallback((id: string, x: number, y: number) => {
+    queryClient.setQueryData(["sticky_notes"], (old: any) =>
+      old?.map((n: any) => (n.id === id ? { ...n, position_x: x, position_y: y } : n))
+    );
+    updateMutation.mutate({ id, position_x: x, position_y: y });
+  }, [queryClient, updateMutation]);
+
+  const handleDelete = (id: string) => deleteMutation.mutate(id);
 
   return (
-    <div className="min-h-screen bg-background p-6 md:p-10">
+    <div
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: "url('/images/cork-texture.jpg')",
+        backgroundSize: "512px 512px",
+        backgroundRepeat: "repeat",
+      }}
+    >
+      {/* Dark overlay for depth */}
+      <div className="absolute inset-0 bg-foreground/5 pointer-events-none" />
+
+      {/* Wooden frame border */}
+      <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/20 rounded-sm"
+        style={{ boxShadow: "inset 0 0 30px hsl(30 10% 20% / 0.2)" }}
+      />
+
       {/* Header */}
-      <header className="max-w-5xl mx-auto mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <StickyNoteIcon className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-handwriting font-bold text-foreground">My Sticky Notes</h1>
+      <header className="relative z-30 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
+          <StickyNoteIcon className="w-7 h-7 text-card-foreground" />
+          <h1 className="text-2xl font-handwriting font-bold text-card-foreground">My Sticky Notes</h1>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
           <ColorPicker selected={selectedColor} onSelect={setSelectedColor} />
           <button
-            onClick={addNote}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity shadow-note"
+            onClick={handleAdd}
+            disabled={addMutation.isPending}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity shadow-note disabled:opacity-50"
           >
-            <Plus className="w-5 h-5" />
+            {addMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
             Add Note
           </button>
         </div>
       </header>
 
-      {/* Notes grid */}
-      <main className="max-w-5xl mx-auto">
-        {notes.length === 0 ? (
+      {/* Notes canvas */}
+      <main className="relative min-h-[80vh]">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-card-foreground animate-spin" />
+          </div>
+        ) : notes.length === 0 ? (
           <div className="text-center py-20">
-            <StickyNoteIcon className="w-16 h-16 text-muted-foreground/40 mx-auto mb-4" />
-            <p className="text-xl font-handwriting text-muted-foreground">No notes yet. Add one!</p>
+            <div className="bg-card/80 backdrop-blur-sm inline-block px-8 py-6 rounded-lg shadow-note">
+              <StickyNoteIcon className="w-16 h-16 text-card-foreground/40 mx-auto mb-4" />
+              <p className="text-xl font-handwriting text-card-foreground">No notes yet. Add one!</p>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-wrap gap-8 justify-center">
-            {notes.map((note) => (
-              <StickyNote
-                key={note.id}
-                id={note.id}
-                text={note.text}
-                color={note.color}
-                rotation={note.rotation}
-                onDelete={deleteNote}
-                onUpdate={updateNote}
-              />
-            ))}
-          </div>
+          notes.map((note) => (
+            <StickyNote
+              key={note.id}
+              id={note.id}
+              text={note.text}
+              color={note.color as NoteColor}
+              rotation={note.rotation}
+              positionX={note.position_x}
+              positionY={note.position_y}
+              onDelete={handleDelete}
+              onUpdate={handleUpdateText}
+              onDragEnd={handleDragEnd}
+            />
+          ))
         )}
       </main>
     </div>
