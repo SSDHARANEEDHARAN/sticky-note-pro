@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, StickyNote as StickyNoteIcon, Loader2, LogOut } from "lucide-react";
+import { Plus, StickyNote as StickyNoteIcon, Loader2, LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import StickyNote from "@/components/StickyNote";
 import ColorPicker from "@/components/ColorPicker";
