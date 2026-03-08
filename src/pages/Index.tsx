@@ -79,14 +79,7 @@ const Index = () => {
   const handleDelete = (id: string) => deleteMutation.mutate(id);
 
   return (
-    <div
-      className="min-h-screen relative"
-      style={{
-        backgroundImage: "url('/images/cork-texture.jpg')",
-        backgroundSize: "512px 512px",
-        backgroundRepeat: "repeat",
-      }}
-    >
+    <div className="min-h-screen relative bg-background">
       <div className="absolute inset-0 bg-foreground/5 pointer-events-none" />
       <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/20 rounded-sm"
         style={{ boxShadow: "inset 0 0 30px hsl(30 10% 20% / 0.2)" }}
