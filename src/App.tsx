@@ -48,6 +48,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={session ? <Navigate to="/" replace /> : <Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/" element={<ProtectedRoute session={session}><Index session={session!} /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
