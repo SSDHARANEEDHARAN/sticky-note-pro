@@ -46,8 +46,8 @@ export default function StickyNote({
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [showTimerPicker, setShowTimerPicker] = useState(false);
-  const [pickerTab, setPickerTab] = useState<"quick" | "custom">("quick");
+  const [showQuickTimer, setShowQuickTimer] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedHour, setSelectedHour] = useState("12");
   const [selectedMinute, setSelectedMinute] = useState("00");
