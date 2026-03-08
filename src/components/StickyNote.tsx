@@ -5,7 +5,6 @@ import type { NoteColor } from "@/lib/notes-api";
 import PushPin from "@/components/PushPin";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import PushPin from "@/components/PushPin";
 
 interface StickyNoteProps {
   id: string;
