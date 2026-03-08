@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, Clock, Bell, BellOff, CalendarIcon } from "lucide-react";
+import { X, Clock, Bell, BellOff, CalendarIcon, User } from "lucide-react";
 import { format } from "date-fns";
 import type { NoteColor } from "@/lib/notes-api";
 import PushPin from "@/components/PushPin";
@@ -16,6 +16,8 @@ interface StickyNoteProps {
   width: number;
   height: number;
   reminderAt: string | null;
+  authorName?: string;
+  isOwnNote: boolean;
   onDelete: (id: string) => void;
   onUpdate: (id: string, text: string) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
@@ -40,7 +42,7 @@ const pinColors: Record<NoteColor, string> = {
 };
 
 export default function StickyNote({
-  id, text, color, rotation, positionX, positionY, width, height, reminderAt,
+  id, text, color, rotation, positionX, positionY, width, height, reminderAt, authorName, isOwnNote,
   onDelete, onUpdate, onDragEnd, onResizeEnd, onSetReminder,
 }: StickyNoteProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -342,6 +344,13 @@ export default function StickyNote({
       <div className={`${colorClasses[color]} shadow-note group-hover:shadow-note-hover p-5 pt-4 transition-shadow duration-300`}
         style={{ minHeight: size.h }}
       >
+        {/* Author badge for shared notes */}
+        {authorName && !isOwnNote && (
+          <div className="flex items-center gap-1 mb-1 text-[10px] font-medium text-card-foreground/50 uppercase tracking-wider">
+            <User className="w-3 h-3" />
+            {authorName}
+          </div>
+        )}
         <div className="absolute inset-x-5 top-10 bottom-5 pointer-events-none"
           style={{ backgroundImage: "repeating-linear-gradient(transparent, transparent 27px, hsl(30 10% 20% / 0.08) 27px, hsl(30 10% 20% / 0.08) 28px)" }}
         />
