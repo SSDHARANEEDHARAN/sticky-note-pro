@@ -79,10 +79,15 @@ const Index = () => {
   const handleDelete = (id: string) => deleteMutation.mutate(id);
 
   return (
-    <div className="min-h-screen relative bg-background">
-      <div className="absolute inset-0 bg-foreground/5 pointer-events-none" />
-      <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/20 rounded-sm"
-        style={{ boxShadow: "inset 0 0 30px hsl(30 10% 20% / 0.2)" }}
+    <div
+      className="min-h-screen relative bg-background"
+      style={{
+        backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      }}
+    >
+      <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/10 rounded-sm"
+        style={{ boxShadow: "inset 0 0 20px hsl(30 10% 20% / 0.05)" }}
       />
 
       <header className="relative z-30 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
