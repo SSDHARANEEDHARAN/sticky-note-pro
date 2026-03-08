@@ -54,7 +54,7 @@ export default function AnimatedBackground({ style }: AnimatedBackgroundProps) {
         }
       } else if (style === "aurora") {
         for (let i = 0; i < 6; i++) {
-          particles.push({ x: 0, y: h * 0.15 + i * (h * 0.08), vx: 0, vy: 0, size: 0, opacity: 0.06, phase: i * 1.2, color: i % 3 === 0 ? "120, 80%" : i % 3 === 1 ? "200, 70%" : "280, 60%" });
+          particles.push({ x: 0, y: h * 0.15 + i * (h * 0.08), vx: 0, vy: 0, size: 0, opacity: 0.06, phase: i * 1.2, color: i % 3 === 0 ? "120, 80%, 50%" : i % 3 === 1 ? "200, 70%, 50%" : "280, 60%, 50%" });
         }
       } else if (style === "hearts") {
         for (let i = 0; i < 25; i++) {
