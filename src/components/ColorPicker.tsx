@@ -1,4 +1,4 @@
-type NoteColor = "yellow" | "pink" | "blue" | "green" | "orange";
+import type { NoteColor } from "@/lib/notes-api";
 
 const colors: { value: NoteColor; className: string }[] = [
   { value: "yellow", className: "bg-note-yellow" },
