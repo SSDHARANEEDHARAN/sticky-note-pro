@@ -1,6 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, Clock, Bell, BellOff } from "lucide-react";
+import { X, Clock, Bell, BellOff, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import type { NoteColor } from "@/lib/notes-api";
+import PushPin from "@/components/PushPin";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import PushPin from "@/components/PushPin";
 
 interface StickyNoteProps {
