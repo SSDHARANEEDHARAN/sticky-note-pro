@@ -1,7 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, Clock, Bell, BellOff } from "lucide-react";
+import { X, Clock, Bell, BellOff, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import type { NoteColor } from "@/lib/notes-api";
 import PushPin from "@/components/PushPin";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 interface StickyNoteProps {
   id: string;
@@ -44,6 +47,11 @@ export default function StickyNote({
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [showTimerPicker, setShowTimerPicker] = useState(false);
+  const [pickerTab, setPickerTab] = useState<"quick" | "custom">("quick");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedHour, setSelectedHour] = useState("12");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+  const [selectedAmPm, setSelectedAmPm] = useState<"AM" | "PM">("AM");
   const [isAlerting, setIsAlerting] = useState(false);
   const [pos, setPos] = useState({ x: positionX, y: positionY });
   const [size, setSize] = useState({ w: width, h: height });
@@ -96,6 +104,8 @@ export default function StickyNote({
     if (diff <= 0) return null;
     const mins = Math.floor(diff / 60000);
     const hrs = Math.floor(mins / 60);
+    const days = Math.floor(hrs / 24);
+    if (days > 0) return `${days}d ${hrs % 24}h`;
     if (hrs > 0) return `${hrs}h ${mins % 60}m`;
     return `${mins}m`;
   };
@@ -180,6 +190,19 @@ export default function StickyNote({
     setShowTimerPicker(false);
   };
 
+  const handleSetCustomReminder = () => {
+    if (!selectedDate) return;
+    let hour = parseInt(selectedHour);
+    const minute = parseInt(selectedMinute);
+    if (selectedAmPm === "PM" && hour !== 12) hour += 12;
+    if (selectedAmPm === "AM" && hour === 12) hour = 0;
+    const target = new Date(selectedDate);
+    target.setHours(hour, minute, 0, 0);
+    if (target.getTime() <= Date.now()) return; // don't set past reminders
+    onSetReminder(id, target.toISOString());
+    setShowTimerPicker(false);
+  };
+
   const timeRemaining = getTimeRemaining();
 
   return (
@@ -244,32 +267,120 @@ export default function StickyNote({
       {showTimerPicker && (
         <div
           data-no-drag
-          className="absolute -left-2 top-6 z-40 bg-card rounded-lg shadow-note-hover p-2 min-w-[140px]"
+          className="absolute -left-2 top-6 z-40 bg-card rounded-xl shadow-note-hover p-3 min-w-[260px]"
           onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
-          <p className="text-xs font-medium text-card-foreground/70 px-2 py-1 font-handwriting">Set reminder:</p>
-          {[
-            { label: "1 min", mins: 1 },
-            { label: "5 mins", mins: 5 },
-            { label: "15 mins", mins: 15 },
-            { label: "30 mins", mins: 30 },
-            { label: "1 hour", mins: 60 },
-            { label: "2 hours", mins: 120 },
-          ].map((opt) => (
+          {/* Tabs */}
+          <div className="flex gap-1 mb-2 bg-muted rounded-lg p-0.5">
             <button
-              key={opt.mins}
-              onClick={() => handleSetTimer(opt.mins)}
-              className="w-full text-left px-2 py-1.5 text-sm text-card-foreground hover:bg-accent/50 rounded transition-colors font-handwriting"
+              onClick={() => setPickerTab("quick")}
+              className={cn(
+                "flex-1 text-xs py-1.5 rounded-md font-medium transition-colors",
+                pickerTab === "quick" ? "bg-card text-card-foreground shadow-sm" : "text-muted-foreground"
+              )}
             >
-              ⏰ {opt.label}
+              ⚡ Quick
             </button>
-          ))}
+            <button
+              onClick={() => setPickerTab("custom")}
+              className={cn(
+                "flex-1 text-xs py-1.5 rounded-md font-medium transition-colors",
+                pickerTab === "custom" ? "bg-card text-card-foreground shadow-sm" : "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="w-3 h-3 inline mr-1" />
+              Date & Time
+            </button>
+          </div>
+
+          {pickerTab === "quick" ? (
+            <div>
+              {[
+                { label: "1 min", mins: 1 },
+                { label: "5 mins", mins: 5 },
+                { label: "15 mins", mins: 15 },
+                { label: "30 mins", mins: 30 },
+                { label: "1 hour", mins: 60 },
+                { label: "2 hours", mins: 120 },
+              ].map((opt) => (
+                <button
+                  key={opt.mins}
+                  onClick={() => handleSetTimer(opt.mins)}
+                  className="w-full text-left px-2 py-1.5 text-sm text-card-foreground hover:bg-accent/50 rounded transition-colors font-handwriting"
+                >
+                  ⏰ {opt.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* Calendar */}
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                className={cn("p-1 pointer-events-auto text-xs")}
+              />
+
+              {/* Time picker */}
+              <div className="flex items-center gap-1 px-1">
+                <span className="text-xs text-card-foreground/70 font-medium">Time:</span>
+                <select
+                  value={selectedHour}
+                  onChange={(e) => setSelectedHour(e.target.value)}
+                  className="bg-muted text-card-foreground text-xs rounded px-1.5 py-1 outline-none cursor-pointer"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                    <option key={h} value={String(h)}>{String(h).padStart(2, "0")}</option>
+                  ))}
+                </select>
+                <span className="text-card-foreground font-bold">:</span>
+                <select
+                  value={selectedMinute}
+                  onChange={(e) => setSelectedMinute(e.target.value)}
+                  className="bg-muted text-card-foreground text-xs rounded px-1.5 py-1 outline-none cursor-pointer"
+                >
+                  {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <div className="flex gap-0.5 ml-1">
+                  {(["AM", "PM"] as const).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setSelectedAmPm(v)}
+                      className={cn(
+                        "text-xs px-1.5 py-1 rounded font-medium transition-colors",
+                        selectedAmPm === v ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Set button */}
+              <button
+                onClick={handleSetCustomReminder}
+                disabled={!selectedDate}
+                className="w-full py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
+              >
+                {selectedDate
+                  ? `Set for ${format(selectedDate, "MMM d")} at ${selectedHour}:${selectedMinute} ${selectedAmPm}`
+                  : "Pick a date first"}
+              </button>
+            </div>
+          )}
+
           {reminderAt && (
             <button
               onClick={() => { onSetReminder(id, null); setShowTimerPicker(false); }}
-              className="w-full text-left px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10 rounded transition-colors font-handwriting"
+              className="w-full text-left px-2 py-1.5 mt-1 text-sm text-destructive hover:bg-destructive/10 rounded transition-colors font-handwriting border-t border-border pt-2"
             >
-              ✕ Clear timer
+              ✕ Clear reminder
             </button>
           )}
         </div>
