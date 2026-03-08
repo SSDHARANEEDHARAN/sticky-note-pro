@@ -13,7 +13,8 @@ const Index = () => {
   const queryClient = useQueryClient();
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
   const [bgStyle, setBgStyle] = useState<BgStyle>(() => {
-    return (localStorage.getItem("stickynotes-bg") as BgStyle) || "dots";
+    const saved = localStorage.getItem("stickynotes-bg") as BgStyle | null;
+    return saved && ["grid", "clouds", "rain", "waves", "snow", "confetti", "aurora", "hearts", "flowers"].includes(saved) ? saved : "grid";
   });
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 

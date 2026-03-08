@@ -1,6 +1,6 @@
-import { Grid3X3, Cloud, CloudRain, Sparkles, CircleDot, Waves } from "lucide-react";
+import { Grid3X3, Cloud, CloudRain, Waves, Heart, Flower2, Snowflake, PartyPopper, Sun } from "lucide-react";
 
-export type BgStyle = "dots" | "grid" | "clouds" | "rain" | "stars" | "waves";
+export type BgStyle = "grid" | "clouds" | "rain" | "waves" | "snow" | "confetti" | "aurora" | "hearts" | "flowers";
 
 interface BgOption {
   value: BgStyle;
@@ -9,12 +9,15 @@ interface BgOption {
 }
 
 const options: BgOption[] = [
-  { value: "dots", label: "Dots", icon: <CircleDot className="w-4 h-4" /> },
   { value: "grid", label: "Grid", icon: <Grid3X3 className="w-4 h-4" /> },
   { value: "clouds", label: "Clouds", icon: <Cloud className="w-4 h-4" /> },
   { value: "rain", label: "Rain", icon: <CloudRain className="w-4 h-4" /> },
-  { value: "stars", label: "Stars", icon: <Sparkles className="w-4 h-4" /> },
   { value: "waves", label: "Waves", icon: <Waves className="w-4 h-4" /> },
+  { value: "snow", label: "Snow", icon: <Snowflake className="w-4 h-4" /> },
+  { value: "confetti", label: "Confetti", icon: <PartyPopper className="w-4 h-4" /> },
+  { value: "aurora", label: "Aurora", icon: <Sun className="w-4 h-4" /> },
+  { value: "hearts", label: "Hearts", icon: <Heart className="w-4 h-4" /> },
+  { value: "flowers", label: "Flowers", icon: <Flower2 className="w-4 h-4" /> },
 ];
 
 interface BackgroundPickerProps {
@@ -24,7 +27,7 @@ interface BackgroundPickerProps {
 
 export default function BackgroundPicker({ selected, onSelect }: BackgroundPickerProps) {
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1 flex-wrap">
       {options.map((opt) => (
         <button
           key={opt.value}
