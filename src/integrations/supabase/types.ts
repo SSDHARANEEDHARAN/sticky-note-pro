@@ -22,6 +22,7 @@ export type Database = {
           id: string
           position_x: number
           position_y: number
+          reminder_at: string | null
           rotation: number
           text: string
           updated_at: string
@@ -34,6 +35,7 @@ export type Database = {
           id?: string
           position_x?: number
           position_y?: number
+          reminder_at?: string | null
           rotation?: number
           text?: string
           updated_at?: string
@@ -46,6 +48,7 @@ export type Database = {
           id?: string
           position_x?: number
           position_y?: number
+          reminder_at?: string | null
           rotation?: number
           text?: string
           updated_at?: string
