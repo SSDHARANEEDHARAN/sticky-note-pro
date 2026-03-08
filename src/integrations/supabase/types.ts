@@ -18,32 +18,38 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          height: number
           id: string
           position_x: number
           position_y: number
           rotation: number
           text: string
           updated_at: string
+          width: number
         }
         Insert: {
           color?: string
           created_at?: string
+          height?: number
           id?: string
           position_x?: number
           position_y?: number
           rotation?: number
           text?: string
           updated_at?: string
+          width?: number
         }
         Update: {
           color?: string
           created_at?: string
+          height?: number
           id?: string
           position_x?: number
           position_y?: number
           rotation?: number
           text?: string
           updated_at?: string
+          width?: number
         }
         Relationships: []
       }

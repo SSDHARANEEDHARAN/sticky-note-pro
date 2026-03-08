@@ -23,7 +23,7 @@ const Index = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...updates }: { id: string } & Partial<{ text: string; position_x: number; position_y: number }>) =>
+    mutationFn: ({ id, ...updates }: { id: string } & Partial<{ text: string; position_x: number; position_y: number; width: number; height: number }>) =>
       updateNote(id, updates),
   });
 
@@ -39,15 +39,15 @@ const Index = () => {
       rotation: randomRotation(),
       position_x: 80 + Math.random() * 400,
       position_y: 120 + Math.random() * 300,
+      width: 224,
+      height: 180,
     });
   };
 
   const handleUpdateText = useCallback((id: string, text: string) => {
-    // Optimistic local update
     queryClient.setQueryData(["sticky_notes"], (old: any) =>
       old?.map((n: any) => (n.id === id ? { ...n, text } : n))
     );
-    // Debounced save
     if (debounceTimers.current[id]) clearTimeout(debounceTimers.current[id]);
     debounceTimers.current[id] = setTimeout(() => {
       updateMutation.mutate({ id, text });
@@ -61,6 +61,13 @@ const Index = () => {
     updateMutation.mutate({ id, position_x: x, position_y: y });
   }, [queryClient, updateMutation]);
 
+  const handleResizeEnd = useCallback((id: string, w: number, h: number) => {
+    queryClient.setQueryData(["sticky_notes"], (old: any) =>
+      old?.map((n: any) => (n.id === id ? { ...n, width: w, height: h } : n))
+    );
+    updateMutation.mutate({ id, width: w, height: h });
+  }, [queryClient, updateMutation]);
+
   const handleDelete = (id: string) => deleteMutation.mutate(id);
 
   return (
@@ -72,15 +79,11 @@ const Index = () => {
         backgroundRepeat: "repeat",
       }}
     >
-      {/* Dark overlay for depth */}
       <div className="absolute inset-0 bg-foreground/5 pointer-events-none" />
-
-      {/* Wooden frame border */}
       <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/20 rounded-sm"
         style={{ boxShadow: "inset 0 0 30px hsl(30 10% 20% / 0.2)" }}
       />
 
-      {/* Header */}
       <header className="relative z-30 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
           <StickyNoteIcon className="w-7 h-7 text-card-foreground" />
@@ -100,7 +103,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Notes canvas */}
       <main className="relative min-h-[80vh]">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
@@ -123,9 +125,12 @@ const Index = () => {
               rotation={note.rotation}
               positionX={note.position_x}
               positionY={note.position_y}
+              width={note.width}
+              height={note.height}
               onDelete={handleDelete}
               onUpdate={handleUpdateText}
               onDragEnd={handleDragEnd}
+              onResizeEnd={handleResizeEnd}
             />
           ))
         )}
