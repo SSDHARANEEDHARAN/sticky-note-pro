@@ -1,0 +1,3 @@
+
+ALTER TABLE public.sticky_notes
+  ADD COLUMN reminder_at TIMESTAMP WITH TIME ZONE DEFAULT NULL;

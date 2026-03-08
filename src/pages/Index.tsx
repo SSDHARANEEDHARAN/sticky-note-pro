@@ -23,7 +23,7 @@ const Index = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...updates }: { id: string } & Partial<{ text: string; position_x: number; position_y: number; width: number; height: number }>) =>
+    mutationFn: ({ id, ...updates }: { id: string } & Partial<{ text: string; position_x: number; position_y: number; width: number; height: number; reminder_at: string | null }>) =>
       updateNote(id, updates),
   });
 
@@ -41,6 +41,7 @@ const Index = () => {
       position_y: 120 + Math.random() * 300,
       width: 224,
       height: 180,
+      reminder_at: null,
     });
   };
 
@@ -66,6 +67,13 @@ const Index = () => {
       old?.map((n: any) => (n.id === id ? { ...n, width: w, height: h } : n))
     );
     updateMutation.mutate({ id, width: w, height: h });
+  }, [queryClient, updateMutation]);
+
+  const handleSetReminder = useCallback((id: string, reminderAt: string | null) => {
+    queryClient.setQueryData(["sticky_notes"], (old: any) =>
+      old?.map((n: any) => (n.id === id ? { ...n, reminder_at: reminderAt } : n))
+    );
+    updateMutation.mutate({ id, reminder_at: reminderAt });
   }, [queryClient, updateMutation]);
 
   const handleDelete = (id: string) => deleteMutation.mutate(id);
@@ -127,10 +135,12 @@ const Index = () => {
               positionY={note.position_y}
               width={note.width}
               height={note.height}
+              reminderAt={note.reminder_at}
               onDelete={handleDelete}
               onUpdate={handleUpdateText}
               onDragEnd={handleDragEnd}
               onResizeEnd={handleResizeEnd}
+              onSetReminder={handleSetReminder}
             />
           ))
         )}
