@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, StickyNote as StickyNoteIcon, Loader2 } from "lucide-react";
 import StickyNote from "@/components/StickyNote";
 import ColorPicker from "@/components/ColorPicker";
+import BackgroundPicker, { type BgStyle } from "@/components/BackgroundPicker";
+import AnimatedBackground from "@/components/AnimatedBackground";
 import { fetchNotes, createNote, updateNote, deleteNote, type NoteColor } from "@/lib/notes-api";
 
 const randomRotation = () => (Math.random() - 0.5) * 8;
@@ -10,7 +12,15 @@ const randomRotation = () => (Math.random() - 0.5) * 8;
 const Index = () => {
   const queryClient = useQueryClient();
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
+  const [bgStyle, setBgStyle] = useState<BgStyle>(() => {
+    return (localStorage.getItem("stickynotes-bg") as BgStyle) || "dots";
+  });
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleBgChange = (bg: BgStyle) => {
+    setBgStyle(bg);
+    localStorage.setItem("stickynotes-bg", bg);
+  };
 
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ["sticky_notes"],
@@ -79,13 +89,9 @@ const Index = () => {
   const handleDelete = (id: string) => deleteMutation.mutate(id);
 
   return (
-    <div
-      className="min-h-screen relative bg-background"
-      style={{
-        backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px)",
-        backgroundSize: "24px 24px",
-      }}
-    >
+    <div className="min-h-screen relative bg-background overflow-hidden">
+      <AnimatedBackground style={bgStyle} />
+
       <div className="absolute inset-0 pointer-events-none border-[12px] border-foreground/10 rounded-sm"
         style={{ boxShadow: "inset 0 0 20px hsl(30 10% 20% / 0.05)" }}
       />
@@ -96,16 +102,21 @@ const Index = () => {
           <h1 className="text-2xl font-handwriting font-bold text-card-foreground">My Sticky Notes</h1>
         </div>
 
-        <div className="flex items-center gap-4 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
-          <ColorPicker selected={selectedColor} onSelect={setSelectedColor} />
-          <button
-            onClick={handleAdd}
-            disabled={addMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity shadow-note disabled:opacity-50"
-          >
-            {addMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-            Add Note
-          </button>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm px-3 py-2 rounded-lg shadow-note">
+            <BackgroundPicker selected={bgStyle} onSelect={handleBgChange} />
+          </div>
+          <div className="flex items-center gap-4 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-note">
+            <ColorPicker selected={selectedColor} onSelect={setSelectedColor} />
+            <button
+              onClick={handleAdd}
+              disabled={addMutation.isPending}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity shadow-note disabled:opacity-50"
+            >
+              {addMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+              Add Note
+            </button>
+          </div>
         </div>
       </header>
 
