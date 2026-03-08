@@ -146,6 +146,13 @@ const Index = ({ session }: IndexProps) => {
             </button>
           </div>
           <button
+            onClick={() => navigate("/profile")}
+            className="flex items-center gap-2 px-3 py-2 bg-card/80 backdrop-blur-sm text-card-foreground rounded-lg hover:opacity-90 transition-opacity shadow-note"
+            title="Profile"
+          >
+            <User className="w-4 h-4" />
+          </button>
+          <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 bg-card/80 backdrop-blur-sm text-card-foreground rounded-lg hover:opacity-90 transition-opacity shadow-note"
             title="Sign Out"
