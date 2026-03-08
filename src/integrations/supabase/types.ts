@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      board_shares: {
+        Row: {
+          created_at: string
+          guest_id: string | null
+          id: string
+          owner_id: string
+          share_code: string
+        }
+        Insert: {
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          owner_id: string
+          share_code: string
+        }
+        Update: {
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          owner_id?: string
+          share_code?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
       sticky_notes: {
         Row: {
           color: string
@@ -26,6 +68,7 @@ export type Database = {
           rotation: number
           text: string
           updated_at: string
+          user_id: string | null
           width: number
         }
         Insert: {
@@ -39,6 +82,7 @@ export type Database = {
           rotation?: number
           text?: string
           updated_at?: string
+          user_id?: string | null
           width?: number
         }
         Update: {
@@ -52,6 +96,7 @@ export type Database = {
           rotation?: number
           text?: string
           updated_at?: string
+          user_id?: string | null
           width?: number
         }
         Relationships: []
@@ -61,7 +106,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_notes: {
+        Args: { _note_owner_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

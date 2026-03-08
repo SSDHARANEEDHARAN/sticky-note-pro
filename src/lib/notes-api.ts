@@ -12,9 +12,10 @@ export interface Note {
   width: number;
   height: number;
   reminder_at: string | null;
+  user_id: string;
 }
 
-const NOTE_FIELDS = "id, text, color, rotation, position_x, position_y, width, height, reminder_at";
+const NOTE_FIELDS = "id, text, color, rotation, position_x, position_y, width, height, reminder_at, user_id";
 
 export async function fetchNotes(): Promise<Note[]> {
   const { data, error } = await supabase
