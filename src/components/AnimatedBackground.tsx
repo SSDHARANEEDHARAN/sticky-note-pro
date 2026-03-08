@@ -148,10 +148,10 @@ export default function AnimatedBackground({ style }: AnimatedBackgroundProps) {
           }
           ctx.lineTo(canvas.width, p.y + 150); ctx.lineTo(0, p.y + 150); ctx.closePath();
           const grad = ctx.createLinearGradient(0, p.y - 60, 0, p.y + 150);
-          grad.addColorStop(0, `hsla(${p.color!}, 0%)`);
+          grad.addColorStop(0, `hsla(${p.color!}, 0)`);
           grad.addColorStop(0.3, `hsla(${p.color!}, ${p.opacity})`);
           grad.addColorStop(0.7, `hsla(${p.color!}, ${p.opacity * 0.5})`);
-          grad.addColorStop(1, `hsla(${p.color!}, 0%)`);
+          grad.addColorStop(1, `hsla(${p.color!}, 0)`);
           ctx.fillStyle = grad; ctx.fill();
         });
       } else if (style === "hearts") {
