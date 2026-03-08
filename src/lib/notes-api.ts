@@ -9,12 +9,16 @@ export interface Note {
   rotation: number;
   position_x: number;
   position_y: number;
+  width: number;
+  height: number;
 }
+
+const NOTE_FIELDS = "id, text, color, rotation, position_x, position_y, width, height";
 
 export async function fetchNotes(): Promise<Note[]> {
   const { data, error } = await supabase
     .from("sticky_notes")
-    .select("id, text, color, rotation, position_x, position_y")
+    .select(NOTE_FIELDS)
     .order("created_at", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Note[];
@@ -24,7 +28,7 @@ export async function createNote(note: Omit<Note, "id">): Promise<Note> {
   const { data, error } = await supabase
     .from("sticky_notes")
     .insert(note)
-    .select("id, text, color, rotation, position_x, position_y")
+    .select(NOTE_FIELDS)
     .single();
   if (error) throw error;
   return data as Note;
