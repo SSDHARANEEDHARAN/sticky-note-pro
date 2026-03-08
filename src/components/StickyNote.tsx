@@ -16,6 +16,8 @@ interface StickyNoteProps {
   width: number;
   height: number;
   reminderAt: string | null;
+  authorName?: string;
+  isOwnNote: boolean;
   onDelete: (id: string) => void;
   onUpdate: (id: string, text: string) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
