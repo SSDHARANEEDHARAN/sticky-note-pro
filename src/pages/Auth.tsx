@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import { StickyNote as StickyNoteIcon, Loader2, ArrowLeft, Mail, Phone, Chrome } from "lucide-react";
+import { StickyNote as StickyNoteIcon, Loader2, ArrowLeft, Mail, Chrome } from "lucide-react";
 import { toast } from "sonner";
 
 type View = "login" | "signup" | "forgot" | "magic";
