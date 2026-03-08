@@ -60,11 +60,11 @@ export default function Auth() {
 
   const titles: Record<View, string> = {
     login: "Welcome Back!", signup: "Join Sticky Notes", forgot: "Reset Password",
-    magic: "Magic Link", phone: "Phone Login", "otp-verify": "Enter OTP",
+    magic: "Magic Link",
   };
   const buttons: Record<View, string> = {
     login: "Sign In", signup: "Sign Up", forgot: "Send Reset Link",
-    magic: "Send Magic Link", phone: "Send OTP", "otp-verify": "Verify",
+    magic: "Send Magic Link",
   };
 
   const isMainView = view === "login" || view === "signup";
