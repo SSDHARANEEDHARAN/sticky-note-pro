@@ -109,21 +109,6 @@ export default function Auth() {
               </div>
             )}
 
-            {view === "phone" && (
-              <div>
-                <label className="block text-sm font-medium text-card-foreground/70 mb-1">Phone Number</label>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background/50 text-foreground outline-none focus:ring-2 focus:ring-ring" placeholder="+1234567890" />
-              </div>
-            )}
-
-            {view === "otp-verify" && (
-              <div>
-                <label className="block text-sm font-medium text-card-foreground/70 mb-1">OTP Code</label>
-                <input type="text" value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required maxLength={6}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background/50 text-foreground outline-none focus:ring-2 focus:ring-ring font-mono text-center tracking-[0.5em] text-xl" placeholder="000000" />
-              </div>
-            )}
 
             <button type="submit" disabled={loading}
               className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
