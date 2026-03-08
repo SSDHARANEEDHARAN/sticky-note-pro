@@ -19,6 +19,7 @@ interface IndexProps {
 
 const Index = ({ session }: IndexProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const userId = session.user.id;
   const [selectedColor, setSelectedColor] = useState<NoteColor>("yellow");
   const [bgStyle, setBgStyle] = useState<BgStyle>(() => {
