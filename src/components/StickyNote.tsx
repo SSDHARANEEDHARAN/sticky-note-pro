@@ -344,6 +344,13 @@ export default function StickyNote({
       <div className={`${colorClasses[color]} shadow-note group-hover:shadow-note-hover p-5 pt-4 transition-shadow duration-300`}
         style={{ minHeight: size.h }}
       >
+        {/* Author badge for shared notes */}
+        {authorName && !isOwnNote && (
+          <div className="flex items-center gap-1 mb-1 text-[10px] font-medium text-card-foreground/50 uppercase tracking-wider">
+            <User className="w-3 h-3" />
+            {authorName}
+          </div>
+        )}
         <div className="absolute inset-x-5 top-10 bottom-5 pointer-events-none"
           style={{ backgroundImage: "repeating-linear-gradient(transparent, transparent 27px, hsl(30 10% 20% / 0.08) 27px, hsl(30 10% 20% / 0.08) 28px)" }}
         />

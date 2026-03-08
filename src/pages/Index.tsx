@@ -178,6 +178,8 @@ const Index = ({ session }: IndexProps) => {
               width={note.width}
               height={note.height}
               reminderAt={note.reminder_at}
+              authorName={note.author_name}
+              isOwnNote={note.user_id === userId}
               onDelete={handleDelete}
               onUpdate={handleUpdateText}
               onDragEnd={handleDragEnd}
