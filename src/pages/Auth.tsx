@@ -33,8 +33,15 @@ export default function Auth() {
         email, password,
         options: { data: { display_name: displayName }, emailRedirectTo: window.location.origin },
       });
-      if (error) toast.error(error.message);
-      else toast.success("Check your email to confirm your account!");
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Check your email to confirm your account!");
+        // Send welcome email via Resend
+        supabase.functions.invoke("welcome-email", {
+          body: { email, display_name: displayName },
+        }).catch(() => {}); // fire-and-forget
+      }
     }
     setLoading(false);
   };
